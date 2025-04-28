@@ -63,6 +63,7 @@ public class InputControl
         foreach (var item in Enum.GetValues( type ))
             Console.WriteLine((int)item + " " + item);
 
+        Console.WriteLine();
         do {
             int i = AskForInt(type.Name);
 

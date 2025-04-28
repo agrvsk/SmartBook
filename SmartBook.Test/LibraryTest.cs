@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using SmartBook.SmartBookCore;
 using Xunit;
 namespace SmartBook.Test;
@@ -47,18 +48,26 @@ public class LibraryTest
     public void CanSaveBooks()
     {
         Library lib = new Library();
-        seed(lib);
-        File.Delete(lib.GetFile());
+        Seed(lib);
+        //File.Delete(lib.GetFile());
+        //Assert.False(File.Exists(lib.GetFile()));
 
-        Assert.False(File.Exists(lib.GetFile()));
-        lib.SaveToFile();
-        Assert.True(File.Exists(lib.GetFile()));
+        string json2Save = lib.GetJsonFromBooks();
+        //lib.SaveToFile();
+
+        //Assert.True(File.Exists(lib.GetFile()));
+        Assert.Equal(Json(), json2Save);
     }
-    public void seed(Library lib)
+    public void Seed(Library lib)
     {
-        lib.AddBook(new(1, "Author", "Title", Category.Novels));
-        lib.AddBook(new(2, "Author2", "Title2", Category.History));
+        lib.AddBook(new Book(3829030428, "Könemann, Ludwig", "Egypten Faraonernas värld", Category.History));
+        lib.AddBook(new Book(9117430925, "Zassenhaus, Hiltgunt", "Muren och stranden", Category.Biographies_and_memoirs));
     }
+    public string Json()
+    {
+        return "[{\"ISBN\":3829030428,\"Author\":\"K\\u00F6nemann, Ludwig\",\"Title\":\"Egypten Faraonernas v\\u00E4rld\",\"Category\":5,\"IsOnLoan\":false,\"BorrowedBy\":0},{\"ISBN\":9117430925,\"Author\":\"Zassenhaus, Hiltgunt\",\"Title\":\"Muren och stranden\",\"Category\":4,\"IsOnLoan\":false,\"BorrowedBy\":0}]";
+    }
+
 
     [Fact]
     public void CanLoadBooks()
@@ -71,11 +80,17 @@ public class LibraryTest
         Assert.Empty(lib.GetBooks());
 
         //Act
-        lib.LoadFromFile();
+        //lib.LoadFromFile();
+        lib.LoadBooksFromJson(Json());
 
         //Assert
         Assert.NotEmpty(lib.GetBooks());
         
     }
+
+    //public void xxx()
+    //{
+    //    LibraryApp
+    //}
 
 }

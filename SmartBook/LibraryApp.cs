@@ -16,6 +16,7 @@ namespace SmartBook;
 */
 internal class LibraryApp
 {
+    //Filenames used 
     public static string BOOKS_FILE = "library.json";
     public static string CARDS_FILE = "cards.json";
     public static string EXPORTED_B = "book_on_loan.txt";
@@ -35,9 +36,9 @@ internal class LibraryApp
     }
     public List<Card> GetCards()
     {
-        return myCardHandler.getCards();
+        return myCardHandler.GetCards();
     }
-    public void seed()
+    public void Seed()
     {
         myLibrary.AddBook(new Book(2, "aaa", "aaa", Category.Novels));
         myLibrary.AddBook(new Book(3, "eee", "eee", Category.Novels));
@@ -257,7 +258,7 @@ internal class LibraryApp
                 ShowAltMenu(card, selected = (AltMenuOptions)ArrowAction.Item2);
                 continue;
             }
-            bool alla = true;
+
             //Enter (or hotkey for accept)
             if (cki.Key == ConsoleKey.Enter
             || AltMenuHotkeys.ContainsKey(cki.Key))
@@ -269,11 +270,11 @@ internal class LibraryApp
                 switch (selected)
                 {
                     case AltMenuOptions.RETURN_ALL:
-                        ReturnBooks(card, alla );
+                        ReturnBooks(card, alla:true );
                         break;
 
                     case AltMenuOptions.RETURN_SELECTED:
-                        ReturnBooks(card, !alla);
+                        ReturnBooks(card, alla:false);
                         break;
 
                     case AltMenuOptions.BORROW:
@@ -381,9 +382,9 @@ internal class LibraryApp
         Console.WriteLine("================================");
 
         string namn = InputControl.AskForString("Name");
-        ulong cardNo = myCardHandler.getNewCard(namn);
+        ulong cardNo = myCardHandler.GetNewCard(namn);
 
-        string jsontext = myCardHandler.SaveToJson();
+        string jsontext = myCardHandler.SaveCardsToJson();
         File.WriteAllText(LibraryApp.CARDS_FILE, jsontext);
 
         Console.WriteLine("");
@@ -716,31 +717,36 @@ internal class LibraryApp
 
     private void LoadData()
     {
-        myLibrary.LoadFromFile();
-        Console.WriteLine($"{myLibrary.GetBooks().Count} books was loaded from file.");
+        //myLibrary.LoadFromFile();
+        if (File.Exists(LibraryApp.BOOKS_FILE))
+        {
+            string json = File.ReadAllText(LibraryApp.BOOKS_FILE);
+            myLibrary.LoadBooksFromJson(json);
+            Console.WriteLine($"{myLibrary.GetBooks().Count()} books was loaded from file.");
+        }
+        else
+            Console.WriteLine($"{LibraryApp.BOOKS_FILE} was not found.");
         
         if (myLibrary.GetBooks().Count() == 0)
-            seed();
+            Seed();
 
 
         if (File.Exists(LibraryApp.CARDS_FILE))
         {
             string json = File.ReadAllText(LibraryApp.CARDS_FILE);
-            ulong lastNo = myCardHandler.LoadFromJson(json);
-            if (lastNo > 0)
-            {
-                Console.WriteLine($"{lastNo} Library cards was loaded. ");
-                Console.WriteLine($"Next number will be: {lastNo + 1}."); //It is not possible to delete cards.
-            }
+            myCardHandler.LoadCardsFromJson(json);
+            Console.WriteLine($"{myCardHandler.GetCards().Count()} Library cards was loaded. ");
         }
-
+        else
+            Console.WriteLine($"{LibraryApp.CARDS_FILE} was not found.");
 
 
     }
     private void SaveToFile()
     {
-        myLibrary.SaveToFile();
-        Console.WriteLine($"{myLibrary.GetBooks().Count} books was saved to file.");
+        File.WriteAllText(LibraryApp.BOOKS_FILE, myLibrary.GetJsonFromBooks() );
+
+        Console.WriteLine($"{myLibrary.GetBooks().Count()} books was saved to file.");
         Console.WriteLine($"Press any key to continue...");
         Console.ReadKey();
     }

@@ -10,39 +10,26 @@ namespace SmartBook.SmartBookCore;
 
 public class LibraryCardHandler
 {
-    private ulong lastID = 0;
+    public ulong LastID { get; private set; }
     private List<Card> Cards;
 
     public LibraryCardHandler()
     {
-        lastID = 0;
+        LastID = 0;
         Cards = new List<Card>();
-        //LoadFromFile();
     }
 
-    public ulong getNewCard(string namn)
+    public ulong GetNewCard(string namn)
     {
-        Cards.Add(new Card(++lastID, namn));
-        //SaveToFile();
-        return lastID;
+        Cards.Add(new Card(++LastID, namn));
+        return LastID;
     }
-    public List<Card> getCards()
+    public List<Card> GetCards()
     {
         return Cards.ToList();
     }
 
-    //public void LoadFromFile()
-    //{
-    //    if (File.Exists(LibraryApp.CARDS_FILE))
-    //        Cards = JsonSerializer.Deserialize<List<Card>>(File.ReadAllText(LibraryApp.CARDS_FILE));
-    //    if (Cards != null && Cards.Count > 0)
-    //    {
-    //        lastID = Cards.Max(x => x.ID);
-    //        Console.WriteLine($"{Cards.Count} Library cards was loaded. ");
-    //        Console.WriteLine($"Next number will be: {lastID + 1}.");
-    //    }
-    //}
-    public ulong LoadFromJson(string json)
+    public void LoadCardsFromJson(string json)
     {
         ulong retur = 0;
 
@@ -51,19 +38,15 @@ public class LibraryCardHandler
 
         if (Cards != null && Cards.Count > 0)
         {
-            lastID = Cards.Max(x => x.ID);
-            return lastID;
+            LastID = Cards.Max(x => x.ID);
+            //return LastID;
         }
 
-        return retur;
+        //return retur;
     }
 
-    //public void SaveToFile()
-    //{
-    //    File.WriteAllText(LibraryApp.CARDS_FILE, JsonSerializer.Serialize(Cards));
-    //}
 
-    public string SaveToJson()
+    public string SaveCardsToJson()
     {
         return JsonSerializer.Serialize(Cards);
     }

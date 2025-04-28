@@ -20,15 +20,25 @@ public class Library
         Books = new List<Book>();
     }
 
-    public void LoadFromFile()
+    public void LoadBooksFromJson(string jsonstring)
     {
-        if(File.Exists(LibraryApp.BOOKS_FILE))
-        Books = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText(LibraryApp.BOOKS_FILE));
+        Books = JsonSerializer.Deserialize<List<Book>>(jsonstring);
     }
-    public void SaveToFile()
+
+    //public void LoadFromFile()
+    //{
+    //    if(File.Exists(LibraryApp.BOOKS_FILE))
+    //    Books = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText(LibraryApp.BOOKS_FILE));
+    //}
+    public string GetJsonFromBooks()
     {
-        File.WriteAllText(LibraryApp.BOOKS_FILE, JsonSerializer.Serialize(Books));
+        return JsonSerializer.Serialize(Books);
     }
+    //public void SaveToFile()
+    //{
+    //    File.WriteAllText(LibraryApp.BOOKS_FILE, JsonSerializer.Serialize(Books));
+    //}
+
     public string GetFile()
     {
         return LibraryApp.BOOKS_FILE;
@@ -48,7 +58,7 @@ public class Library
     public bool BorrowBook(Book book, ulong borrowedBy)
     {
         bool retur = false;
-        Book borrowed = book.checkOut(borrowedBy);
+        Book borrowed = book.CheckOut(borrowedBy);
         if (borrowed == null) return retur;
         if (Books.Remove(book))
         {
@@ -60,7 +70,7 @@ public class Library
     public bool ReturnBook(Book returned)
     {
         bool retur = false;
-        Book book = returned.checkIn();
+        Book book = returned.CheckIn();
         if (book == null) return retur;
 
         if (Books.Remove(returned))
