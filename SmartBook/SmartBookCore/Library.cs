@@ -22,15 +22,16 @@ public class Library
 
     public void LoadFromFile()
     {
-        Books = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText("library.json"));
+        if(File.Exists(LibraryApp.BOOKS_FILE))
+        Books = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText(LibraryApp.BOOKS_FILE));
     }
     public void SaveToFile()
     {
-        File.WriteAllText("library.json", JsonSerializer.Serialize(Books));
+        File.WriteAllText(LibraryApp.BOOKS_FILE, JsonSerializer.Serialize(Books));
     }
     public string GetFile()
     {
-        return "library.json";
+        return LibraryApp.BOOKS_FILE;
     }
 
 
@@ -73,9 +74,17 @@ public class Library
 
 
 
-    public void DeleteBook(Book book)
+    public bool DeleteBook(Book book)
     {
-        Books.Remove(book);
+        return Books.Remove(book);
+    }
+    public bool DeleteBook(ulong isbn)
+    {
+        Book b= Books.Find(b => b.ISBN == isbn);
+        if (b != null)
+            return Books.Remove(b);
+        else
+            return false;
     }
 
     public List<Book> GetBooks()

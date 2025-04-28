@@ -12,12 +12,12 @@ public class InputControl
     {
         do
         {
-            Console.Write($"Ange {prompt}: ");
+            Console.Write($"Enter {prompt}: ");
             string? retur = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(retur))
                 return retur;
 
-            Console.WriteLine("Felaktig input...");
+            Console.WriteLine("Enter somthing...");
 
         } while (true);
     }
@@ -34,7 +34,7 @@ public class InputControl
             if (ulong.TryParse(AskForString(prompt), out ulong retur))
                 return retur;
 
-            Console.WriteLine("Felaktig input...");
+            Console.WriteLine("Not a valid number try again...");
 
         } while (true);
     }
@@ -49,7 +49,7 @@ public class InputControl
             if (int.TryParse(AskForString(prompt), out int retur))
                 return retur;
 
-            Console.WriteLine("Felaktig input...");
+            Console.WriteLine("Not a valid number try again...");
 
         } while (true);
     }
@@ -70,9 +70,6 @@ public class InputControl
                 return Enum.GetValues(type).GetValue(i);
 
         } while (true);
-        //var retur = Enum.GetValues(type).GetValue(i);
-        //Console.WriteLine(retur);
-        //return i;
     }
 
 }
