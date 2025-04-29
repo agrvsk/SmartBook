@@ -64,7 +64,7 @@ Filer:
 	<td>Menyhantering</td>
 </tr>
 <tr>
-<td colspan=3>
+<td colspan=3 align="center" >
 Console metoder och File/IO finns endast i ovanstående filer. 
 </td></tr>
 <tr>
