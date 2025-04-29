@@ -8,22 +8,20 @@ Om inga böcker kunde läsas in, så seedas systemet med ett antal titlar.
 Därefter visas huvudmenyn.
 
 <table>
-<tr>======================================</tr>
-<tr>MAIN MENU</tr>
-<tr>======================================</tr>
-
+<tr><td>======================================</td></tr>
+<tr><td>MAIN MENU</td></tr>
+<tr><td>======================================</td></tr>
+<tr><td>[A] Add a book</td></tr>
+<tr><td>[D] Delete a book</td></tr>
+<tr><td>[L] Show all books</td></tr>
+<tr><td>[F] Find a book</td></tr>
+<tr><td>[C] Issue a new library card</td></tr>
+<tr><td>[M] Borrow / return books</td></tr>
+<tr><td>[W] Show borrowed books</td></tr>
+<tr><td>[P] export books on loan to a file</td></tr>
+<tr><td>[S] Save all books</td></tr>
+<tr><td>[X] Exit</td></tr>
 </table>
-
-[A] Add a book
-[D] Delete a book
-[L] Show all books
-[F] Find a book
-[C] Issue a new library card
-[M] Borrow / return books
-[W] Show books on loan
-[P] export books on loan to a file
-[S] Save all books
-[X] Exit
 
 Menyn kan manövreras antingen med piltangenterna eller via snabbtangenter [?].
 Aktuell rad visas i gult.
@@ -32,13 +30,15 @@ Enter eller snabbtangent för att aktivera ett menyalternativ.
 Menyval M frågar efter kortnummer, 
 Skapa ett sådant i menyalternativ C, 
 och öppnar en undermeny:
-======================================
-LOGGED IN AS NNNNN
-======================================
-[B] Borrow books
-[A] Return all books
-[S] Select books to return
-[X] Exit
+
+<tr><td>======================================</td></tr>
+<tr><td>LOGGED IN AS NNNNN</td></tr>
+<tr><td>======================================</td></tr>
+<tr><td>[B] Borrow books/td></tr>
+<tr><td>[A] Return all books</td></tr>
+<tr><td>[S] Select books to return</td></tr>
+<tr><td>[X] Exit</td></tr>
+</table>
 
 Filer:
 <table>
