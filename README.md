@@ -31,6 +31,7 @@ Menyval M frågar efter kortnummer,
 Skapa ett sådant i menyalternativ C, 
 och öppnar en undermeny:
 
+<table>
 <tr><td>======================================</td></tr>
 <tr><td>LOGGED IN AS NNNNN</td></tr>
 <tr><td>======================================</td></tr>
@@ -63,9 +64,10 @@ Filer:
 	<td>LibraryApp.cs</td>
 	<td>Menyhantering</td>
 </tr>
-<tr span=3>
+<tr>
+<td span=3>
 Console metoder och File/IO finns endast i ovanstående filer. 
-</tr>
+</td></tr>
 <tr>
 	<td>Class</td>
 	<td>Library.cs</td>
