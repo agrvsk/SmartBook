@@ -7,9 +7,13 @@ En välkomstsida visar status efter denna inläsning.
 Om inga böcker kunde läsas in, så seedas systemet med ett antal titlar.
 Därefter visas huvudmenyn.
 
-======================================
-MAIN MENU
-======================================
+<table>
+<tr>======================================</tr>
+<tr>MAIN MENU</tr>
+<tr>======================================</tr>
+
+</table>
+
 [A] Add a book
 [D] Delete a book
 [L] Show all books
