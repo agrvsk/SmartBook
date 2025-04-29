@@ -1,6 +1,6 @@
 # SmartBook
 
-## Min biblioteksapp - en Övningsuppgift för Lexicon.
+## Min biblioteksapp - en övningsuppgift för Lexicon.
 
 Programmet startar med att försöka läsa in böcker och lånekort från separata filer.
 En välkomstsida visar status efter denna inläsning.
@@ -44,7 +44,6 @@ och öppnar en undermeny:
 Filer:
 <table>
 <th>
-	<td>Typ</td>
 	<td>Fil</td>
 	<td>Info</td>
 </th>
@@ -65,7 +64,7 @@ Filer:
 	<td>Menyhantering</td>
 </tr>
 <tr>
-<td span=3>
+<td colspan=3>
 Console metoder och File/IO finns endast i ovanstående filer. 
 </td></tr>
 <tr>
