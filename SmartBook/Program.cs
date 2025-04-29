@@ -11,10 +11,7 @@ internal class Program
 
         LibraryApp app = new LibraryApp();
 
-        //Låter anv. kontrollera om dataladdning i ovanstående metod gick bra.
-        Console.WriteLine("");
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
+        app.LoadData(); 
 
         app.MainMenu();
     }

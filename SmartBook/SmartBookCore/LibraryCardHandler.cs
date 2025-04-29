@@ -31,18 +31,13 @@ public class LibraryCardHandler
 
     public void LoadCardsFromJson(string json)
     {
-        ulong retur = 0;
-
         if (!string.IsNullOrWhiteSpace(json))
             Cards = JsonSerializer.Deserialize<List<Card>>(json);
 
         if (Cards != null && Cards.Count > 0)
         {
             LastID = Cards.Max(x => x.ID);
-            //return LastID;
         }
-
-        //return retur;
     }
 
 

@@ -12,10 +12,11 @@ public record Book(ulong ISBN, string Author, string Title, Category Category, b
 {
     public ulong BorrowedBy { get; set; }
 
-    //Tom Konstruktor krävs för Deserialize
+    //Tom Konstruktor krävs tydligen för Json Deserialize
     public Book() : this(0,null,null,Category.Chapter_books)    {    }
 
     //[JsonConstructor]?
+    //Alternativ konstruktor för den utlånade boken.
     public Book(ulong isbn, string author, string title, Category cat, ulong borrowedBy) : this(isbn,author,title,cat, true)
     {
         BorrowedBy = borrowedBy;
