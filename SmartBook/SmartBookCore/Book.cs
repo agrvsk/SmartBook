@@ -24,7 +24,7 @@ public record Book(ulong ISBN, string Author, string Title, Category Category, b
 
     public override string ToString()
     {
-        return $"{Author} {Title} {Category} {ISBN} {IsOnLoan} {BorrowedBy}";
+        return $"{Author,-25} {Title,-35} {ISBN,-13} {Category}  {IsOnLoan} {BorrowedBy}";
     }
 
     public Book CheckOut(ulong id)

@@ -55,13 +55,13 @@ public class LibraryApp
     }
     public void Seed()
     {
-        MyLibrary.AddBook(new Book(2, "aaa", "aaa", Category.Novels));
-        MyLibrary.AddBook(new Book(3, "eee", "eee", Category.Novels));
-        MyLibrary.AddBook(new Book(4, "www", "qqq", Category.Novels));
-        MyLibrary.AddBook(new Book(5, "ppp", "ppp", Category.Novels));
-        MyLibrary.AddBook(new Book(1, "bbb", "bbb", Category.Novels));
-        MyLibrary.AddBook(new Book(3829030428, "Könemann, Ludwig", "Egypten Faraonernas värld", Category.History));
-        MyLibrary.AddBook(new Book(9117430925, "Zassenhaus, Hiltgunt", "Muren och stranden", Category.Biographies_and_memoirs));
+        MyLibrary.AddBook(new Book(9789173517942, "Eriksson, Thomas", "Vanmakt", Category.Selfhelp_and_personal_development));
+        MyLibrary.AddBook(new Book(9789146144501, "Fröding, Gustaf", "Samlade dikter", Category.Poetry_collections));
+        MyLibrary.AddBook(new Book(9789155028152, "Holmberg, Nils", "Tusen och en natt", Category.Mystery_and_Thrillers));
+        MyLibrary.AddBook(new Book(9789163884214, "Riordan, Rick", "Percy Jackson - Född till hjälte", Category.Young_adult_novels));
+        MyLibrary.AddBook(new Book(9789100102970, "Brown, Dan", "Da Vinci Koden", Category.Novels));
+        MyLibrary.AddBook(new Book(9783829030428, "Könemann, Ludwig", "Egypten Faraonernas värld", Category.History));
+        MyLibrary.AddBook(new Book(9789117430925, "Zassenhaus, Hiltgunt", "Muren och stranden", Category.Biographies_and_memoirs));
         //91 - 1 - 743092 - 5
     }
     #region Lånekortsmeny
@@ -214,7 +214,7 @@ public class LibraryApp
 
                     case MainMenuOptions.DELETE:
                         DeleteBook();
-                        continue;   //will not wait for keypress
+                        continue;   //will not wait for keystroke
 
                     case MainMenuOptions.LIST:
                         ListBooks();
@@ -230,7 +230,7 @@ public class LibraryApp
 
                     case MainMenuOptions.MENU:
                         Menu();
-                        continue; //will not wait for keypress
+                        continue; //will not wait for keystroke
 
                     case MainMenuOptions.BORROWED_SHOW:
                         Borrowed(export: false);
@@ -250,7 +250,7 @@ public class LibraryApp
                         break;
                     case MainMenuOptions.EXIT:
                         bAvsluta = true;
-                        continue; //Will not wait for keypress..
+                        continue; //Will not wait for keystroke
 
                     default:
                         Console.WriteLine("Menu option not implemented! ");
@@ -267,10 +267,9 @@ public class LibraryApp
     {
         if (File.Exists(LibraryApp.LOGFILE))
         {
-            //The file is open in another process (by _Logger )
+            //The file is opened by _Logger
             FileStream logFileStream=null;
             StreamReader logFileReader = null;
-
             try
             {
                 Console.Clear();
@@ -279,8 +278,6 @@ public class LibraryApp
 
                 while (!logFileReader.EndOfStream)
                     Console.WriteLine(logFileReader.ReadLine());
-                
-
             }
             catch (Exception e)
             {
@@ -292,7 +289,6 @@ public class LibraryApp
                 if(logFileReader != null) logFileReader.Close();
                 if(logFileStream != null) logFileStream.Close();
             }
-
 
         }
         
@@ -355,6 +351,8 @@ public class LibraryApp
     public void Menu()
     {
         ulong no = InputControl.AskForULong("Library Card No");
+        
+        //Check if the card is a valid card in our List<Card>
         Card xx = GetCards().Find(c => c.ID == no);
         if (xx != null)
             AltMenu(xx);
@@ -367,7 +365,7 @@ public class LibraryApp
 
     }
 
-    //Menu navigation with arrowkeys - used in both menus.
+    //Menu navigation with arrowkeys - used by List<Book>.
     private (bool, int) ArrowHandled(List<Book> list, int selected, ConsoleKey key)
     {
         //Move selection up
@@ -678,23 +676,9 @@ public class LibraryApp
 
             //List all the books for the user to choose from.
             ShowListWithCurrentRowSelected(myBorrowedBooks, idxCurrent);
-            //foreach ((int, Book) tup in myBorrowedBooks.Index())
-            //{
-            //    if (idxCurrent == tup.Item1)
-            //    {   //Currently selected index is color-marked
-            //        Console.ForegroundColor = ConsoleColor.Yellow;
-            //        Console.WriteLine($"{tup.Item1} {tup.Item2}");
-            //        Console.ResetColor();
-            //    }
-            //    else
-            //        Console.WriteLine($"{tup.Item1} {tup.Item2}");
-            //}
-            //Console.WriteLine("");
-            //Console.WriteLine($"{myBorrowedBooks.Count} Books was found.");
 
             //Let the user navigate in the list above by changing the current index.
             ConsoleKeyInfo key = Console.ReadKey();
-            //Let the user navigate in the list above.
             (bool, int) ArrowAction = ArrowHandled(myBorrowedBooks, idxCurrent, key.Key);
             if (ArrowAction.Item1)
             {

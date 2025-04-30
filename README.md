@@ -37,7 +37,7 @@ Menyval M kräver ett giltigt kortnummer för att,
 <tr><td>======================================</td></tr>
 <tr><td>LOGGED IN AS NNNNN</td></tr>
 <tr><td>======================================</td></tr>
-<tr><td>[B] Borrow books/td></tr>
+<tr><td>[B] Borrow books</td></tr>
 <tr><td>[A] Return all books</td></tr>
 <tr><td>[S] Select books to return</td></tr>
 <tr><td>[X] Exit</td></tr>
@@ -110,10 +110,10 @@ Filer:
    <td>Library.cs</td><td>Testar att ta bort en Book via ISBN ur List&lt;Book&gt;</td>
 </tr>
 <tr>
-   <td>Library.cs</td><td>Testar att ta bort en Book via titel List&lt;Book&gt;</td>
+   <td>Library.cs</td><td>Testar att ta bort en Book via titel ur List&lt;Book&gt;</td>
 </tr>
 <tr>
-   <td>Library.cs</td><td>Testar validering vid insert av Book med duplikat isbn</td>
+   <td>Library.cs</td><td>Testar validering vid insert av Books med samma isbn</td>
 </tr>
 <tr>
    <td>Library.cs</td><td>Testar export av Books från List&lt;Book&gt; till json</td>
