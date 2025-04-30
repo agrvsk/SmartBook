@@ -2,11 +2,11 @@
 
 ## Min biblioteksapp - en övningsuppgift för Lexicon.
 
-Programmet startar med att försöka läsa in böcker och lånekort från separata filer.
-En välkomstsida visar status efter denna inläsning.
-Om inga böcker kunde läsas in, så seedas systemet med ett antal titlar.
-Därefter visas huvudmenyn.
-
+Programmet startar med att försöka läsa in böcker och lånekort från separata filer.  
+En välkomstsida visar status efter denna inläsning.  
+Om inga böcker kunde läsas in, så seedas systemet med ett antal titlar.  
+Därefter visas huvudmenyn.  
+  
 <table>
 <tr><td>======================================</td></tr>
 <tr><td>MAIN MENU</td></tr>
@@ -18,19 +18,21 @@ Därefter visas huvudmenyn.
 <tr><td>[C] Issue a new library card</td></tr>
 <tr><td>[M] Borrow / return books</td></tr>
 <tr><td>[W] Show borrowed books</td></tr>
-<tr><td>[P] export books on loan to a file</td></tr>
-<tr><td>[S] Save all books</td></tr>
+<tr><td>[P] export borrowed books to a file</td></tr>
+<tr><td>[S] Save all books </td></tr>
+<tr><td>[H] Show logfile</td></tr>
 <tr><td>[X] Exit</td></tr>
 </table>
-
-Menyn kan manövreras antingen med piltangenterna eller via snabbtangenter [?].
-Aktuell rad visas i gult.
-Enter eller snabbtangent för att aktivera ett menyalternativ.
-
-Menyval M frågar efter kortnummer, 
-Skapa ett sådant i menyalternativ C, 
-och öppnar en undermeny:
-
+  
+Menyn kan manövreras antingen med piltangenterna eller via snabbtangenter [?].  
+Aktuell rad visas i gult.  
+Enter eller snabbtangent för att aktivera ett menyalternativ.  
+  
+Skapa ett kortnummer i menyalternativ C.  
+  
+Menyval M kräver ett giltigt kortnummer för att,  
+öppna korthavarens undermeny:  
+  
 <table>
 <tr><td>======================================</td></tr>
 <tr><td>LOGGED IN AS NNNNN</td></tr>
@@ -40,14 +42,14 @@ och öppnar en undermeny:
 <tr><td>[S] Select books to return</td></tr>
 <tr><td>[X] Exit</td></tr>
 </table>
-
-Filer:
+  
+Filer:  
+  
 <table>
 <th>
 	<td>Fil</td>
 	<td>Info</td>
 </th>
-
 <tr>
 	<td>Class</td>
 	<td>Program.cs</td>
@@ -64,18 +66,18 @@ Filer:
 	<td>Menyhantering</td>
 </tr>
 <tr>
-<td colspan=3 align="center" >
-Console metoder och File/IO finns endast i ovanstående filer. 
-</td></tr>
+  <td colspan=3 align="center" >
+  Console och I/O metoder finns endast i ovanstående filer. 
+  </td></tr>
 <tr>
 	<td>Class</td>
 	<td>Library.cs</td>
-	<td>Hanterar böcker m.h.a en List<Book></td>
+	<td>Hanterar böcker m.h.a en List&lt;Book&gt;</td>
 </tr>
 <tr>
 	<td>Class</td>
 	<td>LibraryCardHandler.cs</td>
-	<td>Hanterar lånekort m.h.a. en List<Card></td>
+	<td>Hanterar lånekort m.h.a. en List&lt;Card&gt;</td>
 </tr>
 <tr>
 	<td>Record</td>
@@ -94,7 +96,44 @@ Console metoder och File/IO finns endast i ovanstående filer.
 </tr>
 
 </table>
+  
+## Testning  
+  
+<table>
+<tr>
+   <td>Library.cs</td><td>Testar att lägga till en Book i List&lt;Book&gt;</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar att ta bort en Book ur List&lt;Book&gt;</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar att ta bort en Book via ISBN ur List&lt;Book&gt;</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar att ta bort en Book via titel List&lt;Book&gt;</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar validering vid insert av Book med duplikat isbn</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar export av Books från List&lt;Book&gt; till json</td>
+</tr>
+<tr>
+   <td>Library.cs</td><td>Testar import av Books från json till List&lt;Book&gt;</td>
+</tr>
 
+
+<tr>
+   <td>LibraryApp.cs</td><td>Testar import av Books från File till List&lt;Book&gt;</td>
+</tr>
+<tr>
+   <td>LibraryApp.cs</td><td>Testar export av Books från List&lt;Book&gt; till File</td>
+</tr>
+<tr>
+   <td>LibraryApp.cs</td><td>Testar felmeddelande om filen saknas </td>
+</tr>
+
+</table>
 
 
 

@@ -24,10 +24,10 @@ public class LibraryApp
     public static string BOOKS_FILE = "library.json";
     public static string CARDS_FILE = "cards.json";
     public static string EXPORTED_B = "book_on_loan.txt";
-    public static string LOGFILE    = "log.txt";
+    public static string LOGFILE = "log.txt";
 
     private readonly ILogger _logger;
-
+    private static ILoggerFactory factory=null;
 
     public Library MyLibrary { get; private set; }
     private LibraryCardHandler myCardHandler;
@@ -41,9 +41,12 @@ public class LibraryApp
 
     public ILogger GetLogger()
     {
-            ILoggerFactory factory = new LoggerFactory();              
-            factory.AddProvider(new FileLoggerProvider(LOGFILE));  
-            return factory.CreateLogger<LibraryApp>();
+        if (factory == null)
+        {
+            factory = new LoggerFactory();
+            factory.AddProvider(new FileLoggerProvider(LOGFILE));
+        }
+        return factory.CreateLogger<LibraryApp>();
     }
 
     public List<Card> GetCards()
@@ -87,9 +90,9 @@ public class LibraryApp
     private void ShowAltMenu(Card card, AltMenuOptions selected)
     {
         Console.Clear();
-        Console.WriteLine("======================================");
-        Console.WriteLine($"LOGGED IN AS {card.Name} ");
-        Console.WriteLine("======================================");
+        Console.WriteLine("======================================" +
+                         $"{Environment.NewLine}LOGGED IN AS {card.Name}{Environment.NewLine}" +
+                          "======================================");
 
         foreach (AltMenuOptions item in Enum.GetValues(typeof(AltMenuOptions)))
         {
@@ -115,9 +118,10 @@ public class LibraryApp
         FIND,
         GETCARD,
         MENU,
-        ON_LOAN_SHOW,
-        ON_LOAN_SAVE,
+        BORROWED_SHOW,
+        BORROWED_SAVE,
         SAVE,
+        SHOW_LOG,
         EXIT
     }
     // Ledtexter för ovanstående menyalternativ
@@ -129,9 +133,10 @@ public class LibraryApp
         { MainMenuOptions.FIND,         "[F] Find a book"},
         { MainMenuOptions.GETCARD,      "[C] Issue a new library card"},
         { MainMenuOptions.MENU,         "[M] Borrow / return books"},
-        { MainMenuOptions.ON_LOAN_SHOW, "[W] Show borrowed books"},
-        { MainMenuOptions.ON_LOAN_SAVE, "[P] export borrowed books to a file"},
+        { MainMenuOptions.BORROWED_SHOW, "[W] Show borrowed books"},
+        { MainMenuOptions.BORROWED_SAVE, "[P] export borrowed books to a file"},
         { MainMenuOptions.SAVE,         "[S] Save all books"},
+        { MainMenuOptions.SHOW_LOG,     "[H] Show logfile"},
         { MainMenuOptions.EXIT,         "[X] Exit"},
 
     };
@@ -144,9 +149,10 @@ public class LibraryApp
         { ConsoleKey.F,         MainMenuOptions.FIND },
         { ConsoleKey.C,         MainMenuOptions.GETCARD },
         { ConsoleKey.M,         MainMenuOptions.MENU },
-        { ConsoleKey.W,         MainMenuOptions.ON_LOAN_SHOW },
-        { ConsoleKey.P,         MainMenuOptions.ON_LOAN_SAVE },
+        { ConsoleKey.W,         MainMenuOptions.BORROWED_SHOW },
+        { ConsoleKey.P,         MainMenuOptions.BORROWED_SAVE },
         { ConsoleKey.S,         MainMenuOptions.SAVE },
+        { ConsoleKey.H,         MainMenuOptions.SHOW_LOG },
         { ConsoleKey.X,         MainMenuOptions.EXIT },
         { ConsoleKey.Escape,    MainMenuOptions.EXIT },
 
@@ -155,9 +161,9 @@ public class LibraryApp
     private void ShowMainMenu(MainMenuOptions selected)
     {
         Console.Clear();
-        Console.WriteLine("======================================");
-        Console.WriteLine("MAIN MENU");
-        Console.WriteLine("======================================");
+        Console.WriteLine("======================================" +
+                         $"{Environment.NewLine}MAIN MENU{Environment.NewLine}" +
+                          "======================================");
 
         foreach (MainMenuOptions item in Enum.GetValues(typeof(MainMenuOptions)))
         {
@@ -204,11 +210,11 @@ public class LibraryApp
                 {
                     case MainMenuOptions.ADD:
                         AddBook();
-                        continue;
+                        break;   
 
                     case MainMenuOptions.DELETE:
                         DeleteBook();
-                        break;
+                        continue;   //will not wait for keypress
 
                     case MainMenuOptions.LIST:
                         ListBooks();
@@ -224,14 +230,14 @@ public class LibraryApp
 
                     case MainMenuOptions.MENU:
                         Menu();
-                        continue;
+                        continue; //will not wait for keypress
 
-                    case MainMenuOptions.ON_LOAN_SHOW:
-                        OnLoan(export:false);
+                    case MainMenuOptions.BORROWED_SHOW:
+                        Borrowed(export: false);
                         break;
 
-                    case MainMenuOptions.ON_LOAN_SAVE:
-                        OnLoan(export:true);
+                    case MainMenuOptions.BORROWED_SAVE:
+                        Borrowed(export: true);
                         break;
 
 
@@ -239,9 +245,12 @@ public class LibraryApp
                         SaveToFile();
                         break;
 
+                    case MainMenuOptions.SHOW_LOG:
+                        ShowLog();
+                        break;
                     case MainMenuOptions.EXIT:
                         bAvsluta = true;
-                        continue;
+                        continue; //Will not wait for keypress..
 
                     default:
                         Console.WriteLine("Menu option not implemented! ");
@@ -254,6 +263,40 @@ public class LibraryApp
         } while (!bAvsluta);
     }
 
+    private void ShowLog()
+    {
+        if (File.Exists(LibraryApp.LOGFILE))
+        {
+            //The file is open in another process (by _Logger )
+            FileStream logFileStream=null;
+            StreamReader logFileReader = null;
+
+            try
+            {
+                Console.Clear();
+                logFileStream = new FileStream(LibraryApp.LOGFILE, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                logFileReader = new StreamReader(logFileStream);
+
+                while (!logFileReader.EndOfStream)
+                    Console.WriteLine(logFileReader.ReadLine());
+                
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally 
+            {
+                // Clean up
+                if(logFileReader != null) logFileReader.Close();
+                if(logFileStream != null) logFileStream.Close();
+            }
+
+
+        }
+        
+    }
 
     public void AltMenu(Card card)
     {
@@ -283,11 +326,11 @@ public class LibraryApp
                 switch (selected)
                 {
                     case AltMenuOptions.RETURN_ALL:
-                        ReturnBooks(card, alla:true );
+                        ReturnBooks(card, alla: true);
                         break;
 
                     case AltMenuOptions.RETURN_SELECTED:
-                        ReturnBooks(card, alla:false);
+                        ReturnBooks(card, alla: false);
                         break;
 
                     case AltMenuOptions.BORROW:
@@ -320,13 +363,40 @@ public class LibraryApp
             Console.WriteLine("No librarycard with number {no} has been issued!");
             Console.ReadKey();
         }
-            
+
 
     }
 
+    //Menu navigation with arrowkeys - used in both menus.
+    private (bool, int) ArrowHandled(List<Book> list, int selected, ConsoleKey key)
+    {
+        //Move selection up
+        if (key == ConsoleKey.UpArrow
+        || key == ConsoleKey.LeftArrow)
+        {
+            selected--;
 
+            if (selected < 0)
+                selected = list.Count - 1;
 
-    //Menu navigation with arrowkeys - used in multiple menus.
+            return (true, selected);
+        }
+        //Move selection down
+        if (key == ConsoleKey.DownArrow
+        || key == ConsoleKey.RightArrow)
+        {
+            selected++;
+
+            if (selected > list.Count - 1)  
+                selected = 0;
+
+            return (true, selected);
+        }
+        return (false, selected);
+
+    }
+
+    //Menu navigation with arrowkeys - used in both menus.
     private (bool, int) ArrowHandled(Type enumType, int selected, ConsoleKey key)
     {
         //Move selection up
@@ -357,9 +427,9 @@ public class LibraryApp
     private void ListBooks()
     {
         Console.Clear();
-        Console.WriteLine("================================");
-        Console.WriteLine($"List of books ");
-        Console.WriteLine("================================");
+        Console.WriteLine("================================" +
+                         $"{Environment.NewLine}List of books {Environment.NewLine}" +
+                          "================================");
 
         foreach (Book book in MyLibrary.GetBooks())
         {
@@ -368,15 +438,13 @@ public class LibraryApp
 
         Console.WriteLine("");
         Console.WriteLine($"{MyLibrary.GetBooks().Count} books found.");
-        //Console.WriteLine("press any key to continue...");
-        //Console.ReadKey();
     }
     private void FindBooks()
     {
         Console.Clear();
-        Console.WriteLine("================================");
-        Console.WriteLine($"Search for Books (use * wildcard)");
-        Console.WriteLine("================================");
+        Console.WriteLine("================================" +
+                         $"{Environment.NewLine}Search for Books (use * wildcard){Environment.NewLine}" +
+                          "================================");
         string author = InputControl.AskForString("Author");
         string title = InputControl.AskForString("Title");
 
@@ -388,36 +456,30 @@ public class LibraryApp
         }
         Console.WriteLine("");
         Console.WriteLine($"{urval.Count} Books found.");
-        //Console.WriteLine("press any key to continue...");
-        //Console.ReadKey();
 
     }
 
     private void GenerateLibraryCard()
     {
         Console.Clear();
-        Console.WriteLine("================================");
-        Console.WriteLine("Library Card Application:");
-        Console.WriteLine("================================");
+        Console.WriteLine("================================" +
+                         $"{Environment.NewLine}Library Card Application:{Environment.NewLine}" +
+                          "================================");
 
         string namn = InputControl.AskForString("Name");
         ulong cardNo = myCardHandler.GetNewCard(namn);
         string jsontext = myCardHandler.SaveCardsToJson();
         File.WriteAllText(LibraryApp.CARDS_FILE, jsontext);
-        _logger.Log(LogLevel.Information, "Card no {cardNo} was issued to {namn}.", [cardNo,namn] );
+        _logger.Log(LogLevel.Information, "Card no {cardNo} was issued to {namn}.", [cardNo, namn]);
 
-        //Console.WriteLine("");
-        //Console.WriteLine("================================");
-        Console.WriteLine($"Card issued: {cardNo}");
-        Console.WriteLine("================================");
+        Console.WriteLine($"Card issued: {cardNo}{Environment.NewLine}" +
+                           "================================");
 
         Console.WriteLine("");
-        //Console.WriteLine("press any key to continue...");
-        //Console.ReadKey();
 
     }
 
-    private void OnLoan(bool export)
+    private void Borrowed(bool export)
     {
         StringBuilder sb = new StringBuilder();
         sb = sb.AppendLine("================================");
@@ -437,47 +499,25 @@ public class LibraryApp
 
         if (export)
         {
-            File.WriteAllText(EXPORTED_B, sb.ToString() );
+            File.WriteAllText(EXPORTED_B, sb.ToString());
             Console.WriteLine($"{urval.Count} books was exported to {EXPORTED_B}");
         }
         else
         {
             Console.Clear();
             Console.Write(sb.ToString());
-            //Console.WriteLine($"{urval.Count} Books found.");
-
         }
-
-
-        //Console.WriteLine("================================");
-        //Console.WriteLine($"Books OnLoan");
-        //Console.WriteLine("================================");
-
-        //var urval = myLibrary.GetBooks()
-        //.Where(b => b.IsOnLoan == true)
-        //.ToList();
-
-        //foreach (Book book in urval)
-        //    Console.WriteLine(book);
-
-
-        //Console.WriteLine("press any key to continue...");
-        //Console.ReadKey();
-
     }
 
 
 
     private void AddBook()
     {
-        int iAdderat = 0;
-        bool bAvsluta = false;
-        do
-        {
             Console.Clear();
-            Console.WriteLine("======================================");
-            Console.WriteLine("ADD BOOKS");
-            Console.WriteLine("======================================");
+            Console.WriteLine("======================================" +
+                             $"{Environment.NewLine}ADD BOOKS{Environment.NewLine}" +
+                             $"======================================");
+
             try
             {
                 ulong isbn = InputControl.AskForULong("ISBN");
@@ -488,10 +528,9 @@ public class LibraryApp
                 Book book = new Book(isbn, author, title, cat);
                 MyLibrary.AddBook(book);
 
-                iAdderat++;
                 Console.WriteLine("");
-                Console.WriteLine($"{iAdderat} book(s) added.");
-                _logger.Log(LogLevel.Information, "The book \"{title}\" was added", book.Title);
+                Console.WriteLine($"The book was added.");
+            _logger.Log(LogLevel.Information, "The book \"{title}\" was added", book.Title);
 
             }
             catch (Exception e)
@@ -499,17 +538,6 @@ public class LibraryApp
                 Console.WriteLine("");
                 Console.WriteLine(e.Message);
             }
-
-            Console.WriteLine("X to exit. Press any key to continue...");
-            ConsoleKeyInfo key = Console.ReadKey();
-            if (key.Key == ConsoleKey.X)
-            {
-                bAvsluta = true;
-                continue;
-            }
-                
-
-        } while (!bAvsluta);
     }
 
 
@@ -519,35 +547,47 @@ public class LibraryApp
         do
         {
             Console.Clear();
-            Console.WriteLine("================================");
-            Console.WriteLine("Select the book to delete and press <delete> ");
-            Console.WriteLine("or press <Q> or <T> to enter isbn/title for the book to delete.");
-            Console.WriteLine("================================");
+            Console.WriteLine("================================" +
+                             $"{Environment.NewLine}Select the book to delete and press <delete>" +
+                             $"{Environment.NewLine}or press <Q> or <T> to enter isbn/title for the book to delete." +
+                             $"{Environment.NewLine}================================");
 
-            foreach ((int, Book) tup in MyLibrary.GetBooks().Index())
-            {
-                if (idxCurrent == tup.Item1)
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{tup.Item2}");
-                    Console.ResetColor();
-                }
-                else
-                    Console.WriteLine($"{tup.Item2}");
-            }
-            Console.WriteLine("");
-            Console.WriteLine($"{MyLibrary.GetBooks().Count} Books was found.");
+            List<Book> List4Delete = MyLibrary.GetBooks().ToList();
+            ShowListWithCurrentRowSelected(List4Delete, idxCurrent);
+            //foreach ((int, Book) tup in List4Delete.Index())
+            //{
+            //    if (idxCurrent == tup.Item1)
+            //    {
+            //        Console.ForegroundColor = ConsoleColor.Yellow;
+            //        Console.WriteLine($"{tup.Item2}");
+            //        Console.ResetColor();
+            //    }
+            //    else
+            //        Console.WriteLine($"{tup.Item2}");
+            //}
+            //Console.WriteLine("");
+            //Console.WriteLine($"{List4Delete.Count()} Books was found.");
 
-            //Enter ISBN to delete the book and end the loop
             ConsoleKeyInfo key = Console.ReadKey();
+            if (key.Key == ConsoleKey.X
+             || key.Key == ConsoleKey.Escape)
+                break;
+
+            //Let the user navigate in the list above.
+            (bool, int) ArrowAction = ArrowHandled(List4Delete, idxCurrent, key.Key );
+            if (ArrowAction.Item1)
+            {
+                idxCurrent = ArrowAction.Item2;
+                continue;
+            }
+
             if (key.Key == ConsoleKey.Q)
             {
                 ulong isbn = InputControl.AskForULong("ISBN");
                 bool status = MyLibrary.DeleteBookByIsbn(isbn);
                 Console.WriteLine($"The book was {((status) ? "removed." : "not removed.")} ");
-                if(status) _logger.Log(LogLevel.Information, "The book with isbn {isbn} was deleted", isbn);
-
-                break;
+                if (status) _logger.Log(LogLevel.Information, "The book with isbn {isbn} was deleted", isbn);
+                continue;
             }
             if (key.Key == ConsoleKey.T)
             {
@@ -555,57 +595,54 @@ public class LibraryApp
                 bool status = MyLibrary.DeleteBookByTitle(title);
                 Console.WriteLine($"The book was {((status) ? "removed." : "not removed.")} ");
                 if (status) _logger.Log(LogLevel.Information, "The book with title {title} was deleted.", title);
-
-                break;
+                continue;
             }
 
-            //Let the user navigate in the list above.
-            if (key.Key == ConsoleKey.UpArrow
-            || key.Key == ConsoleKey.LeftArrow)
-            {
-                if (idxCurrent > 0)
-                    idxCurrent--;
-            }
-
-            if (key.Key == ConsoleKey.DownArrow
-            || key.Key == ConsoleKey.RightArrow)
-            {
-                if (idxCurrent < MyLibrary.GetBooks().Count() - 1)
-                    idxCurrent++;
-            }
-
-            if (key.Key == ConsoleKey.X
-            || key.Key == ConsoleKey.Escape)
-                break;
 
             if (key.Key == ConsoleKey.Delete)
             {
-                Book b = MyLibrary.GetBooks().ElementAt(idxCurrent);
+                Book b = List4Delete.ElementAt(idxCurrent);
                 if (b != null)
                 {
-                    bool status = MyLibrary.DeleteBookByIsbn(b.ISBN);
+                    bool status = MyLibrary.DeleteBook(b);
                     if (status) _logger.Log(LogLevel.Information, "{title} was deleted.", b.Title);
                 }
             }
 
         } while (true);
 
-        //Console.WriteLine("press any key to continue...");
-        //Console.ReadKey();
     }
+
+    private void ShowListWithCurrentRowSelected(List<Book> list, int idxCurrent)
+    {
+        foreach ((int, Book) tup in list.Index())
+        {
+            if (idxCurrent == tup.Item1)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"{tup.Item2}");
+                Console.ResetColor();
+            }
+            else
+                Console.WriteLine($"{tup.Item2}");
+        }
+        Console.WriteLine("");
+        Console.WriteLine($"{list.Count()} Books was found.");
+    }
+
     private void ReturnBooks(Card card, bool alla)
     {
         int idxCurrent = 0;
         List<Book> myBorrowedBooks = MyLibrary.GetBooks()
             .Where(b => b.BorrowedBy == card.ID).ToList();
-        
+
         if (myBorrowedBooks.Count() == 0)
         {
             Console.WriteLine("");
             Console.WriteLine("Borrow some books first!");
             Console.WriteLine("press any key to continue...");
             Console.ReadKey();
-            return; 
+            return;
         }
 
         if (alla)
@@ -634,40 +671,35 @@ public class LibraryApp
             if (myBorrowedBooks.Count() == 0) return;
 
             Console.Clear();
-            Console.WriteLine("================================");
-            Console.WriteLine("Select the book to return and press");
-            Console.WriteLine("<enter> or <space> to select it.");
-            Console.WriteLine("================================");
+            Console.WriteLine("================================" +
+                             "Select the book to return and press" +
+                             $"{Environment.NewLine}<enter> or <space> to select it.{Environment.NewLine}" +
+                             "================================");
 
             //List all the books for the user to choose from.
-            foreach ((int, Book) tup in myBorrowedBooks.Index())
-            {
-                if (idxCurrent == tup.Item1)
-                {   //Currently selected index is color-marked
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{tup.Item1} {tup.Item2}");
-                    Console.ResetColor();
-                }
-                else
-                    Console.WriteLine($"{tup.Item1} {tup.Item2}");
-            }
-            Console.WriteLine("");
-            Console.WriteLine($"{myBorrowedBooks.Count} Books was found.");
+            ShowListWithCurrentRowSelected(myBorrowedBooks, idxCurrent);
+            //foreach ((int, Book) tup in myBorrowedBooks.Index())
+            //{
+            //    if (idxCurrent == tup.Item1)
+            //    {   //Currently selected index is color-marked
+            //        Console.ForegroundColor = ConsoleColor.Yellow;
+            //        Console.WriteLine($"{tup.Item1} {tup.Item2}");
+            //        Console.ResetColor();
+            //    }
+            //    else
+            //        Console.WriteLine($"{tup.Item1} {tup.Item2}");
+            //}
+            //Console.WriteLine("");
+            //Console.WriteLine($"{myBorrowedBooks.Count} Books was found.");
 
             //Let the user navigate in the list above by changing the current index.
             ConsoleKeyInfo key = Console.ReadKey();
-            if (key.Key == ConsoleKey.UpArrow
-            || key.Key == ConsoleKey.LeftArrow)
+            //Let the user navigate in the list above.
+            (bool, int) ArrowAction = ArrowHandled(myBorrowedBooks, idxCurrent, key.Key);
+            if (ArrowAction.Item1)
             {
-                if (idxCurrent > 0)
-                    idxCurrent--;
-            }
-
-            if (key.Key == ConsoleKey.DownArrow
-            || key.Key == ConsoleKey.RightArrow)
-            {
-                if (idxCurrent < myBorrowedBooks.Count() - 1)
-                    idxCurrent++;
+                idxCurrent = ArrowAction.Item2;
+                continue;
             }
 
             if (key.Key == ConsoleKey.X
@@ -675,7 +707,7 @@ public class LibraryApp
                 break;
 
             if (key.Key == ConsoleKey.Enter
-            ||  key.Key == ConsoleKey.Spacebar  )
+            || key.Key == ConsoleKey.Spacebar)
             {
                 Book selectedBook = myBorrowedBooks.ElementAt(idxCurrent);
 
@@ -683,7 +715,7 @@ public class LibraryApp
                 if (selectedBook != null)
                 {
                     bool status = MyLibrary.ReturnBook(selectedBook);
-                    if(status )_logger.Log(LogLevel.Debug, "{name} returned {title}", card.Name, selectedBook.Title);
+                    if (status) _logger.Log(LogLevel.Debug, "{name} returned {title}", card.Name, selectedBook.Title);
 
                     myBorrowedBooks = MyLibrary.GetBooks()
                                     .Where(b => b.BorrowedBy == card.ID).ToList();
@@ -703,41 +735,22 @@ public class LibraryApp
         do
         {
             Console.Clear();
-            Console.WriteLine("================================");
-            Console.WriteLine("Select the book to borrow and press <enter>");
-            Console.WriteLine("================================");
+            Console.WriteLine("================================" +
+                             $"{Environment.NewLine}Select the book to borrow and press <enter> or <space> {Environment.NewLine}" +
+                              "================================");
 
-            //List all the books for the user to choose from.
+            //List of all books not already borrowed.
             List<Book> booksAtHand = MyLibrary.GetBooks().Where(b => b.IsOnLoan == false).ToList();
-
-            foreach ((int, Book) tup in booksAtHand.Index())
-            {
-                    if (idxCurrent == tup.Item1)
-                {   //Currently selected index is color-marked
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{tup.Item1} {tup.Item2}");
-                    Console.ResetColor();
-                }
-                else
-                    Console.WriteLine($"{tup.Item1} {tup.Item2}");
-            }
-            Console.WriteLine("");
-            Console.WriteLine($"{booksAtHand.Count} Books was found.");
+            ShowListWithCurrentRowSelected(booksAtHand, idxCurrent);
 
             //Let the user navigate in the list above by changing the current index.
             ConsoleKeyInfo key = Console.ReadKey();
-            if (key.Key == ConsoleKey.UpArrow
-            || key.Key == ConsoleKey.LeftArrow)
-            {
-                if (idxCurrent > 0)
-                    idxCurrent--;
-            }
 
-            if (key.Key == ConsoleKey.DownArrow
-            || key.Key == ConsoleKey.RightArrow)
+            (bool, int) ArrowAction = ArrowHandled(booksAtHand, idxCurrent, key.Key);
+            if (ArrowAction.Item1)
             {
-                if (idxCurrent < MyLibrary.GetBooks().Count() - 1)
-                    idxCurrent++;
+                idxCurrent = ArrowAction.Item2;
+                continue;
             }
 
             if (key.Key == ConsoleKey.X
@@ -745,15 +758,14 @@ public class LibraryApp
                 break;
 
             if (key.Key == ConsoleKey.Enter
-            ||  key.Key == ConsoleKey.Spacebar)
+            || key.Key == ConsoleKey.Spacebar)
             {
                 Book selectedBook = booksAtHand.ElementAt(idxCurrent);
                 //mark the selected book as borrowed.
                 if (selectedBook != null)
                 {
                     bool status = MyLibrary.BorrowBook(selectedBook, card.ID);
-                    if (status) _logger.Log(LogLevel.Debug, "{name} borrowed {Title}.", card.Name, selectedBook.Title  );
-
+                    if (status) _logger.Log(LogLevel.Debug, "{name} borrowed {Title}.", card.Name, selectedBook.Title);
                 }
             }
 
@@ -769,7 +781,7 @@ public class LibraryApp
             MyLibrary.LoadBooksFromJson(json);
             Console.WriteLine($"{MyLibrary.GetBooks().Count()} books was loaded from file.");
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             throw new Exception($"Could not read {LibraryApp.BOOKS_FILE}.", e);
         }
@@ -801,20 +813,20 @@ public class LibraryApp
         {
             Console.WriteLine(e.Message);
         }
-        
+
         if (MyLibrary.GetBooks().Count() == 0)
         {
             Seed();
             Console.WriteLine($"The empty library was seeded with {MyLibrary.GetBooks().Count()} books.");
         }
-            
+
 
         try
         {
             if (File.Exists(LibraryApp.CARDS_FILE))
-            LoadCards();
-        else
-            Console.WriteLine($"The file \"{LibraryApp.CARDS_FILE}\" was not found.");
+                LoadCards();
+            else
+                Console.WriteLine($"The file \"{LibraryApp.CARDS_FILE}\" was not found.");
         }
         catch (Exception e)
         {
@@ -828,7 +840,7 @@ public class LibraryApp
     }
     public void SaveToFile()
     {
-        File.WriteAllText(LibraryApp.BOOKS_FILE, MyLibrary.GetJsonFromBooks() );
+        File.WriteAllText(LibraryApp.BOOKS_FILE, MyLibrary.GetJsonFromBooks());
         Console.WriteLine($"{MyLibrary.GetBooks().Count()} books was saved to file.");
     }
 

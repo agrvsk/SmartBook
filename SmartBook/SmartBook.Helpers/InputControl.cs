@@ -17,7 +17,7 @@ public class InputControl
             if (!string.IsNullOrWhiteSpace(retur))
                 return retur;
 
-            Console.WriteLine("Enter somthing...");
+            Console.WriteLine("Not a valid value. Try again...");
 
         } while (true);
     }
@@ -34,7 +34,7 @@ public class InputControl
             if (ulong.TryParse(AskForString(prompt), out ulong retur))
                 return retur;
 
-            Console.WriteLine("Not a valid number try again...");
+            Console.WriteLine("Not a valid number. Try again...");
 
         } while (true);
     }
@@ -49,7 +49,7 @@ public class InputControl
             if (int.TryParse(AskForString(prompt), out int retur))
                 return retur;
 
-            Console.WriteLine("Not a valid number try again...");
+            Console.WriteLine("Not a valid number. Try again...");
 
         } while (true);
     }

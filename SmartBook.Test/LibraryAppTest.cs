@@ -11,7 +11,7 @@ namespace SmartBook.Test;
 public class LibraryAppTest
 {
     [Fact]
-    public void CanSaveBooks()
+    public void CanSaveBooksToFile()
     {
         LibraryApp lib = new LibraryApp();
 
@@ -26,7 +26,7 @@ public class LibraryAppTest
     }
 
     [Fact]
-    public void CanLoadBooks()
+    public void CanLoadBooksFromFile()
     {
         //Arrange
         File.WriteAllText(LibraryApp.BOOKS_FILE, Json() );
@@ -50,9 +50,8 @@ public class LibraryAppTest
         LibraryApp lib = new LibraryApp();
         File.Delete(LibraryApp.BOOKS_FILE);
 
-        //Act
 
-        //Assert
+        //Act & Assert
         var ex = Assert.Throws<Exception>( () => lib.LoadBooks() );
 
         Assert.Equal("Could not read library.json.", ex.Message);
@@ -61,6 +60,7 @@ public class LibraryAppTest
 
     }
 
+    //Data for test...
     private void Seed(Library lib)
     {
         lib.AddBook(new Book(3829030428, "Könemann, Ludwig", "Egypten Faraonernas värld", Category.History));
